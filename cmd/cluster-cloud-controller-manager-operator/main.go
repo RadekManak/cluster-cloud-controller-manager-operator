@@ -156,11 +156,6 @@ func main() {
 	}
 	tlsOpts := []func(*tls.Config){tlsConfigFunc}
 
-	// Create a tls.Config with the profile settings for passing to the reconciler.
-	// This config is used to extract tls configuration for operand deployments.
-	operandTLSConfig := &tls.Config{}
-	tlsConfigFunc(operandTLSConfig)
-
 	syncPeriod := 10 * time.Minute
 	mgr, err := ctrl.NewManager(restConfig, ctrl.Options{
 		Scheme: scheme,
@@ -270,7 +265,7 @@ func main() {
 		Scheme:            mgr.GetScheme(),
 		ImagesFile:        *imagesFile,
 		FeatureGateAccess: featureGateAccessor,
-		TLSConfig:         operandTLSConfig,
+		TLSProfileSpec:    tlsProfileSpec,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterOperator")
 		os.Exit(1)
